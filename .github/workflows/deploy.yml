@@ -1,0 +1,46 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the application (if applicable)
+      - name: Build application
+        run: npm run build
+
+      # Deploy to EC2
+      - name: Deploy to EC2
+        env:
+          HOST: ${{ secrets.SERVER_HOST }}
+          PEM_KEY: ${{ secrets.SERVER_KEY }}
+        run: |
+          echo "$PEM_KEY" > ec2-key.pem
+          chmod 600 ec2-key.pem
+          rsync -avz -e "ssh -i ec2-key.pem -o StrictHostKeyChecking=no" ./ ubuntu@$HOST:/home/ubuntu/app/
+          ssh -i ec2-key.pem -o StrictHostKeyChecking=no ubuntu@$HOST <<EOF
+            cd /home/ubuntu/app
+            npm install
+            pm2 stop all || true
+            pm2 start server.js --name "wesolutizecms-$(date '+%Y-%m-%d_%H-%M-%S')"
+          EOF
+
