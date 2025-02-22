@@ -43,6 +43,7 @@ class BlogController {
               },
             }
           : {},
+ order: [["date", "DESC"]], // Order by date in descending order
       });
       res.status(200).json({ blogs });
     } catch (error) {
