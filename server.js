@@ -46,7 +46,7 @@ app.use(bodyParser.json({ limit: "100mb" }));
 app.use(bodyParser.urlencoded({ limit: "100mb", extended: true }));
 // app.use(compression());
 
-app.use("/test", (req, res) => res.send("<h1>This is a test API_28052025</h1>"));
+app.use("/test", (req, res) => res.send("<h1>This is a test API_28052025tweee</h1>"));
 app.use("/api/auth", authRoutes);
 app.use("/api/testimonial", testimonialRoutes);
 app.use("/api/news", newsRoutes);
